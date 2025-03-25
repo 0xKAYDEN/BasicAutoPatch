@@ -35,12 +35,15 @@
             lblFile = new Label();
             lblDownloadSpeed = new Label();
             lblSpeed = new Label();
+            radDx8 = new RadioButton();
+            radDx9 = new RadioButton();
+            checkNoEffects = new CheckBox();
             SuspendLayout();
             // 
             // btnStart
             // 
             btnStart.Anchor = AnchorStyles.Bottom | AnchorStyles.Left;
-            btnStart.Location = new Point(169, 125);
+            btnStart.Location = new Point(12, 40);
             btnStart.Name = "btnStart";
             btnStart.Size = new Size(253, 48);
             btnStart.TabIndex = 0;
@@ -91,11 +94,50 @@
             lblSpeed.TabIndex = 5;
             lblSpeed.Text = "Download Speed :";
             // 
+            // radDx8
+            // 
+            radDx8.AutoSize = true;
+            radDx8.Checked = true;
+            radDx8.Location = new Point(13, 11);
+            radDx8.Name = "radDx8";
+            radDx8.Size = new Size(48, 19);
+            radDx8.TabIndex = 6;
+            radDx8.TabStop = true;
+            radDx8.Text = "dx_8";
+            radDx8.UseVisualStyleBackColor = true;
+            radDx8.Visible = false;
+            // 
+            // radDx9
+            // 
+            radDx9.AutoSize = true;
+            radDx9.Location = new Point(67, 11);
+            radDx9.Name = "radDx9";
+            radDx9.Size = new Size(48, 19);
+            radDx9.TabIndex = 7;
+            radDx9.Text = "dx_9";
+            radDx9.UseVisualStyleBackColor = true;
+            radDx9.Visible = false;
+            // 
+            // checkNoEffects
+            // 
+            checkNoEffects.AutoSize = true;
+            checkNoEffects.Location = new Point(121, 12);
+            checkNoEffects.Name = "checkNoEffects";
+            checkNoEffects.Size = new Size(89, 19);
+            checkNoEffects.TabIndex = 8;
+            checkNoEffects.Text = "Hide Effects";
+            checkNoEffects.UseVisualStyleBackColor = true;
+            checkNoEffects.Visible = false;
+            checkNoEffects.CheckedChanged += checkNoEffects_CheckedChanged;
+            // 
             // Main
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
-            ClientSize = new Size(626, 185);
+            ClientSize = new Size(281, 100);
+            Controls.Add(checkNoEffects);
+            Controls.Add(radDx9);
+            Controls.Add(radDx8);
             Controls.Add(lblSpeed);
             Controls.Add(lblDownloadSpeed);
             Controls.Add(lblFile);
@@ -118,5 +160,8 @@
         private Label lblFile;
         private Label lblDownloadSpeed;
         private Label lblSpeed;
+        private RadioButton radDx8;
+        private RadioButton radDx9;
+        private CheckBox checkNoEffects;
     }
 }

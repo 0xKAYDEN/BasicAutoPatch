@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Diagnostics;
+using System.Diagnostics.Eventing.Reader;
 using System.Drawing;
 using System.IO.Compression;
 using System.Linq;
@@ -44,6 +45,19 @@ namespace BasicAutoPatch
         {
             if (currentPatchIndex >= PatchList.Count)
             {
+                lblStatus.Visible = false;
+                lblDownloadSpeed.Visible = false;
+                lblFile.Visible = false;
+                lblSpeed.Visible = false;
+                progressBar1.Visible = false;
+                if (this.Height != 111)
+                    this.Height = 111;
+                this.Width = 297;
+                btnStart.Location = new Point(12, 12);
+                this.Height = 139;
+                radDx8.Visible = true;
+                radDx9.Visible = true;
+                checkNoEffects.Visible = true;
                 btnStart.Text = "Play";
                 btnStart.Enabled = true;
                 MessageBox.Show("All patches have been downloaded and installed!", "Complete",
@@ -191,22 +205,25 @@ namespace BasicAutoPatch
                 progressBar1.Visible = true;
                 if (this.Height != 224)
                     this.Height = 224;
-                    this.Width = 642;
+                this.Width = 642;
                 btnStart.Location = new Point(169, 125);
                 btnStart.Text = "Download";
             }
             else if (Configrations.ServerVersion == Configrations.ClientVersion)
             {
-                lblStatus.Visible =false;
-                lblDownloadSpeed.Visible =false;
-                lblFile.Visible =false;
-                lblSpeed.Visible =false;
+                lblStatus.Visible = false;
+                lblDownloadSpeed.Visible = false;
+                lblFile.Visible = false;
+                lblSpeed.Visible = false;
                 progressBar1.Visible = false;
                 if (this.Height != 111)
                     this.Height = 111;
-                    this.Width = 297;
+                this.Width = 297;
                 btnStart.Location = new Point(12, 12);
-                
+                this.Height = 139;
+                radDx8.Visible = true;
+                radDx9.Visible = true;
+                checkNoEffects.Visible = true;
                 btnStart.Text = "Play";
             }
             else
@@ -333,7 +350,8 @@ namespace BasicAutoPatch
             {
                 string extractPath = Application.StartupPath;
 
-                this.Invoke((MethodInvoker)delegate {
+                this.Invoke((MethodInvoker)delegate
+                {
                     lblStatus.Text = "Extracting files...";
                 });
 
@@ -346,7 +364,8 @@ namespace BasicAutoPatch
                         string destinationPath = Path.GetFullPath(Path.Combine(extractPath, entry.FullName));
                         Directory.CreateDirectory(Path.GetDirectoryName(destinationPath));
 
-                        this.Invoke((MethodInvoker)delegate {
+                        this.Invoke((MethodInvoker)delegate
+                        {
                             lblStatus.Text = $"Extracting: {entry.Name}";
                         });
 
@@ -361,7 +380,8 @@ namespace BasicAutoPatch
                                 extractedBytes += bytesRead;
 
                                 int progress = (int)((extractedBytes * 100) / totalExtractBytes);
-                                this.Invoke((MethodInvoker)delegate {
+                                this.Invoke((MethodInvoker)delegate
+                                {
                                     progressBar1.Value = progress;
                                     lblStatus.Text = $"Extracting: {entry.Name} ({progress}%)";
                                 });
@@ -370,7 +390,8 @@ namespace BasicAutoPatch
                     }
                 }
 
-                this.Invoke((MethodInvoker)delegate {
+                this.Invoke((MethodInvoker)delegate
+                {
                     File.WriteAllText("version.dat", Configrations.PatchNumber.ToString());
                     Configrations.ClientVersion = Configrations.PatchNumber;
                     lblStatus.Text = "Patch installed successfully!";
@@ -384,7 +405,8 @@ namespace BasicAutoPatch
             }
             catch (Exception ex)
             {
-                this.Invoke((MethodInvoker)delegate {
+                this.Invoke((MethodInvoker)delegate
+                {
                     MessageBox.Show($"Error extracting patch: {ex.Message}", "Error",
                         MessageBoxButtons.OK, MessageBoxIcon.Error);
                     btnStart.Enabled = true;
@@ -426,8 +448,17 @@ namespace BasicAutoPatch
                 {
                     try
                     {
-                        Process.Start(Configrations.GameExecutable);
-                        this.Close();
+                        if (radDx8.Checked)
+                        {
+                            Process.Start("Env_DX8//Conqer.exe", "blacknull");
+                            this.Close();
+                        }
+                        if (radDx9.Checked)
+                        {
+                            Process.Start("Env_DX9//Conqer.exe", "blacknull");
+                            this.Close();
+                        }
+
                     }
                     catch (Exception ex)
                     {
@@ -451,8 +482,8 @@ namespace BasicAutoPatch
             }
         }
 
-            private async Task<bool> RepairCorruptedFiles()
-             {
+        private async Task<bool> RepairCorruptedFiles()
+        {
             var result = MessageBox.Show("Some game files are corrupted. Would you like to repair them?",
                                       "File Corruption Detected",
                                       MessageBoxButtons.YesNo,
@@ -486,5 +517,58 @@ namespace BasicAutoPatch
             return false;
         }
 
+        private void RestoreEffects()
+        {
+            string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
+            string str = System.IO.Path.Combine(baseDirectory, "c3\\effect0");
+            string destDirName = System.IO.Path.Combine(baseDirectory, "c3\\effect");
+            try
+            {
+                if (Directory.Exists(str))
+                {
+                    Directory.Move(str, destDirName);
+                    MessageBox.Show("effects restored");
+                }
+                else
+                    MessageBox.Show("Effects Folder is Missing.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("An error occurred: " + ex.Message);
+            }
+        }
+
+        private void RemoveEffects()
+        {
+            string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
+            string str = System.IO.Path.Combine(baseDirectory, "c3\\effect");
+            string destDirName = System.IO.Path.Combine(baseDirectory, "c3\\effect0");
+            try
+            {
+                if (Directory.Exists(str))
+                {
+                    Directory.Move(str, destDirName);
+                    MessageBox.Show("effects removed");
+                }
+                else
+                    MessageBox.Show("Effects Folder Is Missing.");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("An error occurred: " + ex.Message);
+            }
+        }
+        private void checkNoEffects_CheckedChanged(object sender, EventArgs e)
+        {
+            string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
+            if (checkNoEffects.Checked)
+            {
+                RemoveEffects();
+            }
+            else
+            {
+                RestoreEffects();
+            }
+        }
     }
 }
